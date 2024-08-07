@@ -1,0 +1,61 @@
+name: Generate GitHub Snake
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-snake:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Updated to v4 for compatibility with Node.js v20
+
+      - name: Create dist directory
+        run: mkdir -p dist
+
+      - name: Generate Snake
+        uses: Platane/snk@v3  # Continue using v3 for Platane/snk
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            dist/github-snake.svg
+            dist/github-snake-dark.svg?palette=github-dark
+            dist/ocean.gif?color_snake=orange&color_dots=#bfd6f6,#8dbdff,#64a1f4,#4b91f1,#3c7dd9
+
+      - name: List dist directory contents
+        run: ls -R dist
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Add and Commit Dist Directory
+        run: |
+          git add dist
+          git commit -m "Generate and commit GitHub Snake files"
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+
+      - name: Upload Snake Artifacts
+        uses: actions/upload-artifact@v4  # Updated to v4 for the upload artifact action
+        with:
+          name: snake-artifacts
+          path: |
+            dist/github-snake.svg
+            dist/github-snake-dark.svg
+            dist/ocean.gif
+
+      - name: Output file paths
+        run: |
+          echo "Files generated:"
+          ls -l dist
