@@ -38,7 +38,11 @@ jobs:
       - name: Add and Commit Dist Directory
         run: |
           git add dist
-          git commit -m "Generate and commit GitHub Snake files"
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit"
+          else
+            git commit -m "Generate and commit GitHub Snake files"
+          fi
 
       - name: Push Changes
         uses: ad-m/github-push-action@v0.6.0
