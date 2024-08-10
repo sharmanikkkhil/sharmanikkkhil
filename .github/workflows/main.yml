@@ -38,25 +38,32 @@ jobs:
       - name: Pull latest changes from main
         run: git pull origin main
 
-      - name: Check if dist directory has changes
+      - name: Check for changes
+        id: check_changes
         run: |
           if git diff --quiet dist; then
-            echo "No changes in dist directory. Exiting."
-            exit 0
+            echo "No changes detected" 
+            echo "changed=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected"
+            echo "changed=true" >> $GITHUB_ENV
           fi
 
       - name: Add and Commit Dist Directory
+        if: env.changed == 'true'
         run: |
           git add dist
           git commit -m "Generate and commit GitHub Snake files"
 
       - name: Push Changes
+        if: env.changed == 'true'
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
 
       - name: Upload Snake Artifacts
+        if: env.changed == 'true'
         uses: actions/upload-artifact@v4  # Updated to v4 for the upload artifact action
         with:
           name: snake-artifacts
