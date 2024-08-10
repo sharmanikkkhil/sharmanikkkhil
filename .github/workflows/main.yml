@@ -35,14 +35,13 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Pull latest changes from main
+        run: git pull origin main
+
       - name: Add and Commit Dist Directory
         run: |
           git add dist
-          if git diff-index --quiet HEAD --; then
-            echo "No changes to commit"
-          else
-            git commit -m "Generate and commit GitHub Snake files"
-          fi
+          git commit -m "Generate and commit GitHub Snake files"
 
       - name: Push Changes
         uses: ad-m/github-push-action@v0.6.0
