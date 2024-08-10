@@ -38,6 +38,13 @@ jobs:
       - name: Pull latest changes from main
         run: git pull origin main
 
+      - name: Check if dist directory has changes
+        run: |
+          if git diff --quiet dist; then
+            echo "No changes in dist directory. Exiting."
+            exit 0
+          fi
+
       - name: Add and Commit Dist Directory
         run: |
           git add dist
